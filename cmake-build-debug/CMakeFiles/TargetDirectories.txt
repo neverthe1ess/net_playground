@@ -1,0 +1,3 @@
+/Users/neverthe1ess/CLionProjects/net_playground/cmake-build-debug/CMakeFiles/net_playground.dir
+/Users/neverthe1ess/CLionProjects/net_playground/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/neverthe1ess/CLionProjects/net_playground/cmake-build-debug/CMakeFiles/rebuild_cache.dir
