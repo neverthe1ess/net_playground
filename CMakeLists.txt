@@ -3,4 +3,5 @@ project(net_playground C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(net_playground main.c)
+add_executable(net_playground general_nowait_raw.c
+        print_header.c)
