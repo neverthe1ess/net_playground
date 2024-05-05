@@ -21,8 +21,8 @@
 int main(){
     // TCP, UDP, ICMP 소켓 번호
     int sock_tcp, sock_udp, sock_icmp;
-    // 수신한 tcp, udp, icmp 메시지의 길이, 버퍼의 길이, 구조체의 길이
-    int ret_tcp, ret_udp, ret_icmp, buf_len, len;
+    // 수신한 tcp, udp, icmp 메시지의 길이, 버퍼의 길이, 구조체의 길이, 메시지 번호
+    int ret_tcp, ret_udp, ret_icmp, buf_len, len, msg_number;
     // 수신한 메시지를 저장할 버퍼
     char buffer_icmp[MAX_LEN], buffer_udp[MAX_LEN], buffer_tcp[MAX_LEN];
     // 소켓 주소 구조체
@@ -70,6 +70,7 @@ int main(){
 
     len = sizeof(from_icmp);
     buf_len = MAX_LEN;
+    msg_number = 0;
 
 
     while(1){
@@ -78,30 +79,33 @@ int main(){
         ret_udp = recvfrom(sock_udp, buffer_udp, buf_len, MSG_DONTWAIT, (struct sockaddr *) &from_udp, (socklen_t *) &len);
 
         if(ret_icmp > 0){
-            printf("icmp 소켓으로부터 수신한 데이터의 길이는 %d입니다.\n", ret_icmp);
+            printf("\n메시지 번호 : %d / ICMP 소켓으로부터 수신한 데이터의 길이는 %d입니다.\n", msg_number, ret_icmp);
             struct ip_header_t *ip = (struct ip_header_t *)&buffer_icmp;
             struct icmp_header_t *icmp = (struct icmp_header_t *) (buffer_icmp + (4 * ip -> hlen));
             if(ip -> protocol == PROTO_ICMP) {
                 ip_header_print(ip);
                 icmp_header_print(icmp);
+                msg_number++;
             }
         }
         if(ret_tcp > 0){
-            printf("TCP 소켓으로부터 수신한 데이터의 길이는 %d입니다.\n", ret_tcp);
+            printf("\n메시지 번호 : %d / TCP 소켓으로부터 수신한 데이터의 길이는 %d입니다.\n", msg_number, ret_tcp);
             struct ip_header_t *ip = (struct ip_header_t *)&buffer_tcp;
             struct tcp_header_t *tcp = (struct tcp_header_t *) (buffer_tcp + (4 * ip -> hlen));
             if(ip -> protocol == PROTO_TCP) {
                 ip_header_print(ip);
                 tcp_header_print(tcp);
+                msg_number++;
             }
         }
         if(ret_udp > 0){
-            printf("UDP 소켓으로부터 수신한 데이터의 길이는 %d입니다.\n", ret_udp);
+            printf("\n메시지 번호 : %d / UDP 소켓으로부터 수신한 데이터의 길이는 %d입니다.\n", msg_number, ret_udp);
             struct ip_header_t *ip = (struct ip_header_t *)&buffer_udp;
             struct udp_header_t *udp = (struct udp_header_t *) (buffer_udp + (4 * ip -> hlen));
             if(ip -> protocol == PROTO_UDP) {
                 ip_header_print(ip);
                 udp_header_print(udp);
+                msg_number++;
             }
         }
         if((ret_icmp < 0) && (ret_udp < 0) && (ret_tcp < 0)){

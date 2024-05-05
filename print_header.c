@@ -18,7 +18,7 @@ void ip_header_print(struct ip_header_t *ipHeader){
     printf("Dst ip = %s\n", inet_ntoa(dst));
     printf("총 길이 = %d\n", ntohs(ipHeader -> length));
     printf("식별자 = %d\n", ntohs(ipHeader -> id));
-    printf("TTL = %d\n", ntohs(ipHeader -> ttl));
+    printf("TTL = %d\n", ipHeader -> ttl);
     printf("헤더 검사합 = 0x%X\n", ntohs(ipHeader -> checksum));
 }
 void tcp_header_print(struct tcp_header_t *tcpHeader){
@@ -32,7 +32,7 @@ void tcp_header_print(struct tcp_header_t *tcpHeader){
 
 void icmp_header_print(struct icmp_header_t *icmpHeader){
     printf("---------------ICMP HEADER ---------------\n");
-    printf("타입 = %d\n", ntohs(icmpHeader -> type));
+    printf("타입 = %d\n", icmpHeader -> type);
     printf("코드 = %d\n", ntohs(icmpHeader -> code));
     printf("체크섬 = 0x%X\n", ntohs(icmpHeader -> cksum));
     printf("식별자 = %d\n", ntohs(icmpHeader -> id));
