@@ -76,7 +76,7 @@ struct __attribute__((packed)) tcp_header_t{
 
 
 /*
- * UDP와 ICMP는 바이트 순서와 관련 없음
+ * UDP와 ICMP는 헤더 순서에 바이트 순서를 연관할 필요가 없음
  */
 
 struct __attribute__((packed)) udp_header_t{

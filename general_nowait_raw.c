@@ -1,10 +1,6 @@
 /**
- *
  * tcp, udp, icmp 패킷을 수신하는 스니퍼 프로그램 작성
  * 인터페이스를 프로미스큐어스로 설정
- *
- *
- *
  */
 
 #include <netinet/in.h>
@@ -14,7 +10,6 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include "gerenal_packet.h"
 #include "print_header.h"
 
 #define MAX_LEN 65535
@@ -31,20 +26,24 @@ int main(int argc, char *argv[]){
     // 인터페이스 구조체
     struct ifreq ifreq;
     // 인터페이스의 이름
-    char *interface;
+    char *interface = "ens160";
 
-    if(argc != 2){
+    if(argc > 2){
         printf("사용법 오류! 사용법 ./general_nowait_raw [인터페이스 이름]");
+    } else if(argc == 2){
+        // 입력된 인터페이스를 선택
+        interface = argv[1];
     }
-
-    // 입력된 인터페이스를 선택
-    interface = argv[1];
 
     //소켓 번호 생성
     sock_icmp = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
     sock_tcp = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
     sock_udp = socket(AF_INET, SOCK_RAW, IPPROTO_UDP);
 
+    if(sock_icmp < 0 || sock_tcp < 0 || sock_udp < 0) {
+        perror("소켓 생성 실패");
+        exit(1);
+    }
 
     //인터페이스를 프로미스큐어스 모드로 전환
     strncpy(ifreq.ifr_name, interface, strlen(interface));
@@ -72,7 +71,7 @@ int main(int argc, char *argv[]){
     while(1){
         ret_icmp = recvfrom(sock_icmp, buffer_icmp, buf_len, MSG_DONTWAIT, (struct sockaddr *) &from_icmp, (socklen_t *)&len);
         ret_tcp = recvfrom(sock_tcp, buffer_tcp, buf_len, MSG_DONTWAIT, (struct sockaddr *) &from_tcp, (socklen_t *) &len);
-        ret_udp = recvfrom(sock_udp, buffer_udp, buf_len, MSG_DONTWAIT, (struct sockaddr *) &from_udp, (socklen_t *)&len);
+        ret_udp = recvfrom(sock_udp, buffer_udp, buf_len, MSG_DONTWAIT, (struct sockaddr *) &from_udp, (socklen_t *) &len);
 
         if(ret_icmp > 0){
             printf("icmp 소켓으로부터 수신한 데이터의 길이는 %d입니다.\n", ret_icmp);
@@ -84,25 +83,25 @@ int main(int argc, char *argv[]){
             }
         }
         if(ret_tcp > 0){
-            printf("TCP 소켓으로부터 수신한 데이터의 길이는 %입니다.\n", ret_tcp);
+            printf("TCP 소켓으로부터 수신한 데이터의 길이는 %d입니다.\n", ret_tcp);
             struct ip_header_t *ip = (struct ip_header_t *)&buffer_tcp;
-            struct udp_header_t *tcp = (struct icmp_header_t *) (buffer_tcp + (4 * ip -> hlen));
-            if(ip -> protocol = PROTO_TCP) {
+            struct tcp_header_t *tcp = (struct tcp_header_t *) (buffer_tcp + (4 * ip -> hlen));
+            if(ip -> protocol == PROTO_TCP) {
                 ip_header_print(ip);
                 tcp_header_print(tcp);
             }
         }
         if(ret_udp > 0){
-            printf("UDP 소켓으로부터 수신한 데이터의 길이는 %입니다.\n", ret_udp);
+            printf("UDP 소켓으로부터 수신한 데이터의 길이는 %d입니다.\n", ret_udp);
             struct ip_header_t *ip = (struct ip_header_t *)&buffer_udp;
-            struct udp_header_t *udp = (struct icmp_header_t *) (buffer_udp + (4 * ip -> hlen));
-            if(ip -> protocol = PROTO_UDP) {
+            struct udp_header_t *udp = (struct udp_header_t *) (buffer_udp + (4 * ip -> hlen));
+            if(ip -> protocol == PROTO_UDP) {
                 ip_header_print(ip);
                 udp_header_print(udp);
             }
         }
         if((ret_icmp < 0) && (ret_udp < 0) && (ret_tcp < 0)){
-            printf("waiting............................. \n\n\n");
+            printf("........................waiting........................ \n");
         }
         sleep(2);
     }
