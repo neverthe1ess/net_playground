@@ -3,18 +3,22 @@
  * 인터페이스를 프로미스큐어스로 설정
  */
 
-#include <netinet/in.h>
-#include <net/if.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <sys/ioctl.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <time.h>
 #include "print_header.h"
 
 #define MAX_LEN 65535
 
-int main(int argc, char *argv[]){
+int main(){
     // TCP, UDP, ICMP 소켓 번호
     int sock_tcp, sock_udp, sock_icmp;
     // 수신한 tcp, udp, icmp 메시지의 길이, 버퍼의 길이, 구조체의 길이
@@ -26,19 +30,19 @@ int main(int argc, char *argv[]){
     // 인터페이스 구조체
     struct ifreq ifreq;
     // 인터페이스의 이름
-    char *interface = "ens160";
+    char *interface = "eth0";
 
-    if(argc > 2){
-        printf("사용법 오류! 사용법 ./general_nowait_raw [인터페이스 이름]");
-    } else if(argc == 2){
-        // 입력된 인터페이스를 선택
-        interface = argv[1];
-    }
+//    if(argc > 2){
+//        printf("사용법 오류! 사용법 ./general_nowait_raw [인터페이스 이름]");
+//    } else if(argc == 2){
+//        // 입력된 인터페이스를 선택
+//        interface = argv[1];
+//    }
 
     //소켓 번호 생성
-    sock_icmp = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
-    sock_tcp = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
-    sock_udp = socket(AF_INET, SOCK_RAW, IPPROTO_UDP);
+    sock_icmp = socket(PF_INET, SOCK_RAW, IPPROTO_ICMP);
+    sock_tcp = socket(PF_INET, SOCK_RAW, IPPROTO_TCP);
+    sock_udp = socket(PF_INET, SOCK_RAW, IPPROTO_UDP);
 
     if(sock_icmp < 0 || sock_tcp < 0 || sock_udp < 0) {
         perror("소켓 생성 실패");
@@ -48,7 +52,7 @@ int main(int argc, char *argv[]){
     //인터페이스를 프로미스큐어스 모드로 전환
     strncpy(ifreq.ifr_name, interface, strlen(interface));
 
-    if(ioctl(sock_tcp, SIOCSIFFLAGS, &ifreq) < 0){
+    if(ioctl(sock_tcp, SIOCGIFFLAGS, &ifreq) < 0){
         perror("ifnet의 플래그를 가져오는 걸 실패!");
         exit(1);
     }
