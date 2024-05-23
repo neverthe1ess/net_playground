@@ -30,7 +30,7 @@ int main(){
     // 인터페이스 구조체
     struct ifreq ifreq;
     // 인터페이스의 이름
-    char *interface = "eth0";
+    char *interface = "en0";
 
 //    if(argc > 2){
 //        printf("사용법 오류! 사용법 ./general_nowait_raw [인터페이스 이름]");
