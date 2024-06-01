@@ -6,4 +6,7 @@
   <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$/assign5">
     <contentRoot DIR="$PROJECT_DIR$" />
   </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21_PREVIEW" project-jdk-name="21" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/net_java" />
+  </component>
 </project>
